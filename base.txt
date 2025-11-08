@@ -1,0 +1,23 @@
+letter-love
+
+
+Funcionalidades do projeto – Correio Romântico (Estrutura de Dados)
+
+Pessoa 1 – Estrutura e cadastros
+
+Cadastrar remetentes e destinatários (usar dicionário)
+Criar função para escrever e enviar mensagens
+Armazenar as mensagens em uma fila (ordem de envio)
+
+Pessoa 2 – Entregas e consultas
+4. Criar função para entregar mensagens (retirar da fila e mostrar na tela)
+5. Implementar caixa de entrada para cada pessoa (mensagens recebidas)
+6. Criar função para listar mensagens enviadas e recebidas
+7. Criar histórico geral de mensagens entregues
+
+Pessoa 3 – Extras e interface
+8. Criar menu principal com as opções (cadastrar, enviar, entregar, listar, ranking, sair)
+9. Adicionar opção de pesquisar mensagens por nome (remetente ou destinatário)
+10. Implementar ranking dos mais românticos (quem mais enviou mensagens)
+11. (Opcional) Salvar e carregar os dados em arquivo .txt ou .json
+12. (Futuro) Adicionar envio de mensagens por e-mail real 💌
