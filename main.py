@@ -3,9 +3,6 @@ import time
 import smtplib
 from email.message import EmailMessage
 
-# -----------------------------
-# Estruturas de Dados
-# -----------------------------
 
 class Queue:
     def __init__(self):
@@ -59,7 +56,7 @@ class ArvoreUsuarios:
 
     def _inserir(self, nodo, nome):
         if nome == nodo.nome:
-            return  # já existe
+            return  
         if nome < nodo.nome:
             if nodo.esq is None:
                 nodo.esq = Nodo(nome)
@@ -193,7 +190,7 @@ def enviar_email_smtp(remetente_envio, senha_envio, destino_email, assunto, corp
 # -----------------------------
 # Funções principais do sistema
 # -----------------------------
-def cadastrar_usuario_interativo():
+def cadastrar_usuario():
     nome = input("Digite seu nome para cadastro: ").strip()
     if not nome:
         print("Nome inválido.")
@@ -204,7 +201,7 @@ def cadastrar_usuario_interativo():
     usuarios.inserir(nome)
     print(f"Usuário '{nome}' cadastrado com sucesso!")
 
-def login_interativo():
+def login():
     while True:
         nome = input("Digite seu nome para entrar (ou 'sair' para cancelar): ").strip()
         if nome.lower() == "sair":
@@ -243,7 +240,6 @@ def entregar_proxima_da_fila(enviar_real=False):
         print("Não há mensagens na fila (rascunhos).")
         return
     mensagem = fila_mensagens.dequeue()
-    # Se o destinatário parece um e-mail (contém @), e quiser enviar_real, será usado
     if enviar_real and "@" in mensagem["destinatario"]:
         # requisitar credenciais SMTP do remetente (cache)
         if smtp_cache["email"] is None:
@@ -255,6 +251,7 @@ def entregar_proxima_da_fila(enviar_real=False):
         entregar_mensagem_obj(mensagem)
 
 def listar_recebidas(nome):
+    limpar()
     if nome not in caixas_entrada or not caixas_entrada[nome]:
         print(f"{nome} não tem mensagens recebidas.")
         return
@@ -263,6 +260,7 @@ def listar_recebidas(nome):
         print(f"{i}. De: {msg['remetente']} - Texto: {msg['texto']}")
 
 def listar_enviadas(nome):
+    limpar()
     enviadas = [m for m in historico_geral if m["remetente"] == nome]
     if not enviadas:
         print(f"{nome} não enviou nenhuma mensagem ainda.")
@@ -272,6 +270,7 @@ def listar_enviadas(nome):
         print(f"{i}. Para: {msg['destinatario']} - Texto: {msg['texto']}")
 
 def mostrar_historico():
+    limpar()
     if not historico_geral:
         print("Nenhuma mensagem foi entregue ainda.")
         return
@@ -280,6 +279,7 @@ def mostrar_historico():
         print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
 
 def pesquisar_mensagens(nome):
+    limpar()
     resultados = [m for m in historico_geral if m["remetente"] == nome or m["destinatario"] == nome]
     if not resultados:
         print("Nenhuma mensagem encontrada para esse nome.")
@@ -289,6 +289,7 @@ def pesquisar_mensagens(nome):
         print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
 
 def ranking_romanticos():
+    limpar()
     contador = {}
     for msg in historico_geral:
         remet = msg["remetente"]
@@ -324,6 +325,7 @@ def desfazer_ultima_entrega():
 # Menus e fluxos
 # -----------------------------
 def enviar_mensagem_menu(usuario_logado):
+    limpar()
     print("\n--- ✉️ ENVIAR MENSAGEM ---")
     destinatario = input("Para quem deseja enviar? (coloque nome ou e-mail): ").strip()
     if not destinatario:
@@ -392,6 +394,7 @@ def enviar_mensagem_menu(usuario_logado):
 
 def menu_mensagens(usuario_logado):
     while True:
+        limpar()
         print("\n--- 💌 MENU DE MENSAGENS ---")
         print("""
         1. ✉️ Enviar mensagem
@@ -437,7 +440,10 @@ def menu_mensagens(usuario_logado):
 
 def menu_extras():
     while True:
-        print("\n--- 🏆 EXTRAS ---")
+        limpar()  
+        print("\n" + "═" * 60)
+        print(f"--🏆 E X T R A S --".center(60))
+        print("═" * 60)
         print("""
         1. 💞 Ranking dos mais românticos
         2. 📋 Listar usuários cadastrados (in-order na árvore)
@@ -465,6 +471,7 @@ def menu_extras():
 
 def menu_principal(usuario_logado):
     while True:
+        limpar()
         print("\n" + "═" * 60)
         print(f"💗 C O R R E I O   D O   A M O R  (user: {usuario_logado}) 💗".center(60))
         print("═" * 60)
@@ -489,23 +496,26 @@ def menu_principal(usuario_logado):
             break
         else:
             print("❌ Opção inválida.")
-
+limpar()
 # -----------------------------
 # Entrypoint
 # -----------------------------
 if __name__ == "__main__":
     apresentacao()
-
-    # Loop inicial: cadastro obrigatório / login
     while True:
-        print("1. Login")
-        print("2. Cadastro")
-        print("0. Sair")
+        limpar()
+        print("\n" + "═" * 60)
+        print(f"💗 C O R R E I O   D O   A M O R 💗".center(60))
+        print("═" * 60)
+        print("1.👥 Login")
+        print("2.📋 Cadastro")
+        print("0.❌ Sair")
+
         escolha = input("Escolha: ").strip()
         if escolha == "2":
-            cadastrar_usuario_interativo()
+            cadastrar_usuario()
         elif escolha == "1":
-            usuario = login_interativo()
+            usuario = login()
             if usuario:
                 menu_principal(usuario)
                 break
