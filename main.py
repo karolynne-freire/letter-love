@@ -21,25 +21,34 @@ class Queue:
     def size(self):
         return len(self.queue)
 
+
+# --- BANCOS DE DADOS ---
 remetentes = {}
-destinatarios = {}
-fila_mensagens = Queue()   
+fila_mensagens = Queue()
 caixas_entrada = {}
 historico_geral = []
+
+# --- MODELOS PRONTOS DE MENSAGEM ---
+modelos_prontos = {
+    1: "Desde que te conheci, meu coração bate mais forte. 💖",
+    2: "Você ilumina meus dias como o sol ilumina o amanhecer. ☀️",
+    3: "Se eu fosse um poeta, todas as minhas rimas seriam sobre você. ✨",
+}
+
+
+# ---------------- CADASTRO ----------------
 
 def cadastrar_pessoa(tipo, nome):
     if tipo == "remetente":
         remetentes[nome] = {"nome": nome}
-    elif tipo == "destinatario":
-        destinatarios[nome] = {"nome": nome}
-    print(f"{tipo.title()} '{nome}' cadastrado com sucesso!")
+        print(f"Remetente '{nome}' cadastrado com sucesso!")
+
+
+# ---------------- MENSAGENS ----------------
 
 def enviar_mensagem(remetente, destinatario, texto):
     if remetente not in remetentes:
-        print("Remetente não cadastrado.")
-        return
-    if destinatario not in destinatarios:
-        print("Destinatário não cadastrado.")
+        print("❌ Remetente não cadastrado.")
         return
 
     mensagem = {
@@ -47,11 +56,12 @@ def enviar_mensagem(remetente, destinatario, texto):
         "destinatario": destinatario,
         "texto": texto
     }
+
     fila_mensagens.enqueue(mensagem)
     print("Mensagem adicionada à fila de envio 💌")
 
+
 def entregar_mensagem():
-    """Entrega a próxima mensagem da fila (FIFO)"""
     if fila_mensagens.isEmpty():
         print("Não há mensagens na fila para entregar.")
         return
@@ -66,8 +76,8 @@ def entregar_mensagem():
 
     print(f"💖 Mensagem entregue de {mensagem['remetente']} para {dest}!")
 
+
 def listar_recebidas(nome):
-    """Lista mensagens recebidas"""
     if nome not in caixas_entrada or not caixas_entrada[nome]:
         print(f"{nome} não tem mensagens recebidas.")
         return
@@ -76,8 +86,8 @@ def listar_recebidas(nome):
     for i, msg in enumerate(caixas_entrada[nome], 1):
         print(f"{i}. De: {msg['remetente']} - Texto: {msg['texto']}")
 
+
 def listar_enviadas(nome):
-    """Lista mensagens enviadas"""
     enviadas = [m for m in historico_geral if m["remetente"] == nome]
     if not enviadas:
         print(f"{nome} não enviou nenhuma mensagem ainda.")
@@ -87,17 +97,17 @@ def listar_enviadas(nome):
     for i, msg in enumerate(enviadas, 1):
         print(f"{i}. Para: {msg['destinatario']} - Texto: {msg['texto']}")
 
+
 def mostrar_historico():
-    """Mostra o histórico geral"""
     if not historico_geral:
         print("Nenhuma mensagem foi entregue ainda.")
         return
 
-    print("\n📜 Histórico geral de mensagens entregues:")
+    print("\n📜 Histórico geral:")
     for i, msg in enumerate(historico_geral, 1):
         print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
-        
-        
+
+
 def pesquisar_mensagens(nome):
     resultados = [
         m for m in historico_geral
@@ -111,6 +121,7 @@ def pesquisar_mensagens(nome):
     print(f"\n🔍 Mensagens relacionadas a '{nome}':")
     for i, msg in enumerate(resultados, 1):
         print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
+
 
 def ranking_romanticos():
     contador = {}
@@ -128,8 +139,10 @@ def ranking_romanticos():
 
     for pos, (nome, qtd) in enumerate(ranking, 1):
         print(f"{pos}º - {nome} 💖 ({qtd} mensagens)")
-       
-        
+
+
+# ---------------- INTERFACE / MENUS ----------------
+
 import time
 import os
 
@@ -147,12 +160,12 @@ def apresentacao():
     title = [
 
 
-"██╗     ███████╗████████╗████████╗███████╗████████╗██████╗       ██╗      ██████╗ ██╗   ██╗███████╗",
-"██║     ██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝╚══██╔══╝██╔══██╗      ██║     ██╔═══██╗██║   ██║██╔════╝",
-"██║     █████╗     ██║      ██║   █████╗     ██║   ██████╔╝      ██║     ██║   ██║██║   ██║█████╗  ",
-"██║     ██╔══╝     ██║      ██║   ██╔══╝     ██║   ██╔══██╗      ██║     ██║   ██║╚██╗ ██╔╝██╔══╝  ",
-"███████╗███████╗   ██║      ██║   ███████╗   ██║   ██║  ██║      ███████╗╚██████╔╝ ╚████╔╝ ███████╗",
-"╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚══════╝   ╚═╝   ╚═╝  ╚═╝      ╚══════╝ ╚═════╝   ╚═══╝  ╚══════╝",
+"██╗     ███████╗████████╗████████╗███████╗██████╗       ██╗      ██████╗ ██╗   ██╗███████╗",
+"██║     ██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗      ██║     ██╔═══██╗██║   ██║██╔════╝",
+"██║     █████╗     ██║      ██║   █████╗  ██████╔╝      ██║     ██║   ██║██║   ██║█████╗  ",
+"██║     ██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗      ██║     ██║   ██║╚██╗ ██╔╝██╔══╝  ",
+"███████╗███████╗   ██║      ██║   ███████╗██║  ██║      ███████╗╚██████╔╝ ╚████╔╝ ███████╗",
+"╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝      ╚══════╝ ╚═════╝   ╚═══╝  ╚══════╝",
     ]
 
     # Pintar de vermelho / e deixar o V coral
@@ -171,7 +184,7 @@ def apresentacao():
 
     time.sleep(1)
     limpar()
-        
+
 
 def menu_principal():
     while True:
@@ -198,14 +211,14 @@ def menu_principal():
             print("Saindo... obrigada por espalhar amor 💘")
             break
         else:
-            print("❌ Opção inválida, tente novamente.")
+            print("❌ Opção inválida.")
+
 
 def menu_pessoas():
     while True:
-        print("\n--- 👥 MENU DE Cadastro ---")
+        print("\n--- 👥 CADASTRO ---")
         print("""
         1. 💗 Cadastrar remetente
-        2. 💐 Cadastrar destinatário
         0. 🔙 Voltar
         """)
 
@@ -215,14 +228,12 @@ def menu_pessoas():
             nome = input("Nome do remetente: ")
             cadastrar_pessoa("remetente", nome)
 
-        elif opcao == "2":
-            nome = input("Nome do destinatário: ")
-            cadastrar_pessoa("destinatario", nome)
-
         elif opcao == "0":
             break
         else:
             print("❌ Opção inválida.")
+
+
 def menu_mensagens():
     while True:
         print("\n--- 💌 MENU DE MENSAGENS ---")
@@ -236,13 +247,10 @@ def menu_mensagens():
         0. 🔙 Voltar
         """)
 
-        opcao = input("Escolha uma opção: ")
+        opcao = input("Escolha: ")
 
         if opcao == "1":
-            remetente = input("Quem está enviando? ")
-            destinatario = input("Para quem? ")
-            texto = input("Escreva sua mensagem: ")
-            enviar_mensagem(remetente, destinatario, texto)
+            enviar_mensagem_menu()
 
         elif opcao == "2":
             entregar_mensagem()
@@ -264,51 +272,47 @@ def menu_mensagens():
 
         elif opcao == "0":
             break
+
         else:
             print("❌ Opção inválida.")
-def menu_mensagens():
-    while True:
-        print("\n--- 💌 MENU DE MENSAGENS ---")
-        print("""
-        1. ✉️ Enviar mensagem
-        2. 📬 Entregar próxima mensagem
-        3. 📥 Listar recebidas
-        4. 📤 Listar enviadas
-        5. 🔍 Pesquisar mensagens
-        6. 📜 Histórico geral
-        0. 🔙 Voltar
-        """)
 
-        opcao = input("Escolha uma opção: ")
 
-        if opcao == "1":
-            remetente = input("Quem está enviando? ")
-            destinatario = input("Para quem? ")
-            texto = input("Escreva sua mensagem: ")
-            enviar_mensagem(remetente, destinatario, texto)
+def enviar_mensagem_menu():
+    print("\n--- ✉️ ENVIAR MENSAGEM ---")
 
-        elif opcao == "2":
-            entregar_mensagem()
+    remetente = input("Quem está enviando? ")
+    if remetente not in remetentes:
+        print("❌ Remetente não cadastrado.")
+        return
 
-        elif opcao == "3":
-            nome = input("Listar recebidas de quem? ")
-            listar_recebidas(nome)
+    destinatario = input("Para quem deseja enviar? (qualquer nome) ")
 
-        elif opcao == "4":
-            nome = input("Listar enviadas por quem? ")
-            listar_enviadas(nome)
+    print("""
+    Escolha o tipo de mensagem:
+    1. ✍️ Escrever texto próprio
+    2. 💝 Usar mensagem pronta
+    """)
 
-        elif opcao == "5":
-            termo = input("Pesquisar por nome: ")
-            pesquisar_mensagens(termo)
+    escolha = input("Opção: ")
 
-        elif opcao == "6":
-            mostrar_historico()
+    if escolha == "1":
+        texto = input("Escreva sua mensagem: ")
 
-        elif opcao == "0":
-            break
-        else:
-            print("❌ Opção inválida.")
+    elif escolha == "2":
+        print("\n💌 Modelos disponíveis:")
+        for num, modelo in modelos_prontos.items():
+            print(f"{num}. {modelo}")
+
+        num_escolhido = int(input("Escolha um modelo: "))
+        texto = modelos_prontos.get(num_escolhido, "Mensagem de amor 💖")
+
+    else:
+        print("❌ Opção inválida.")
+        return
+
+    enviar_mensagem(remetente, destinatario, texto)
+
+
 def menu_extras():
     while True:
         print("\n--- 🏆 EXTRAS ---")
@@ -317,16 +321,16 @@ def menu_extras():
         0. 🔙 Voltar
         """)
 
-        opcao = input("Escolha uma opção: ")
+        opcao = input("Escolha: ")
 
         if opcao == "1":
             ranking_romanticos()
 
         elif opcao == "0":
             break
+
         else:
             print("❌ Opção inválida.")
-
 
 
 if __name__ == "__main__":
