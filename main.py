@@ -95,7 +95,6 @@ class ArvoreUsuarios:
 
 class GrafoConexoes:
     def __init__(self):
-        # dicionário: remetente -> {destinatario: contador}
         self.adj = {}
 
     def adicionar_aresta(self, remetente, destinatario):
@@ -109,12 +108,12 @@ class GrafoConexoes:
 # -----------------------------
 # Banco de dados em memória
 # -----------------------------
-usuarios = ArvoreUsuarios()        # árvore de usuários cadastrados
-fila_mensagens = Queue()           # rascunhos / fila de envio
-caixas_entrada = {}                # nome -> [mensagens]
-historico_geral = []               # lista de mensagens entregues
-pilha_acoes = Stack()              # para undo (últimas entregas)
-grafo = GrafoConexoes()            # conexões remetente->destinatario
+usuarios = ArvoreUsuarios()       
+fila_mensagens = Queue()          
+caixas_entrada = {}                
+historico_geral = []              
+pilha_acoes = Stack()              
+grafo = GrafoConexoes()           
 
 # Modelos prontos
 modelos_prontos = {
@@ -164,7 +163,7 @@ smtp_cache = {
     "senha": None
 }
 
-def enviar_email_smtp(remetente_envio, senha_envio, destino_email, assunto, corpo):
+def enviar_smtp(remetente_envio, senha_envio, destino_email, assunto, corpo):
     """Envia um email real via Gmail SMTP SSL. Retorna True se enviado com sucesso."""
     try:
         msg = EmailMessage()
@@ -173,7 +172,6 @@ def enviar_email_smtp(remetente_envio, senha_envio, destino_email, assunto, corp
         msg["Subject"] = assunto
         msg.set_content(corpo)
 
-        # detecta servidor pelo domínio do remetente - por enquanto foco em Gmail
         servidor = "smtp.gmail.com"
         porta = 465
 
@@ -191,25 +189,34 @@ def enviar_email_smtp(remetente_envio, senha_envio, destino_email, assunto, corp
 # Funções principais do sistema
 # -----------------------------
 def cadastrar_usuario():
-    nome = input("Digite seu nome para cadastro: ").strip()
-    if not nome:
-        print("Nome inválido.")
+    nome = input("Digite seu nome para cadastro: ").strip().lower()
+
+    if nome == "":
+        print("\nNome não pode ser vazio.\n")
+        input("Pressione Enter para continuar...")
         return
+
     if usuarios.buscar(nome):
-        print("Esse usuário já existe. Faça login.")
+        print("\nUsuário já existe. Faça login.\n")
+        input("Pressione Enter para continuar...")
         return
+
     usuarios.inserir(nome)
-    print(f"Usuário '{nome}' cadastrado com sucesso!")
+    print(f"\nUsuário '{nome}' cadastrado com sucesso! 🎉\n")
+    input("Pressione Enter para continuar...")
+
 
 def login():
-    while True:
-        nome = input("Digite seu nome para entrar (ou 'sair' para cancelar): ").strip()
-        if nome.lower() == "sair":
-            return None
-        if usuarios.buscar(nome):
-            print(f"Bem-vindo(a), {nome} 💖")
-            return nome
-        print("Usuário não encontrado. Cadastre-se primeiro!")
+    nome = input("Digite seu nome (Enter para sair): ").strip().lower()
+
+    if nome == "":
+        return None
+    if usuarios.buscar(nome):
+        print(f"\nBem-vindo(a), {nome} 💖\n")
+        return nome
+    print("\nUsuário não encontrado. Retornando ao menu...\n")
+    time.sleep(1)
+    return None
 
 def entregar_mensagem_obj(mensagem, enviar_real=False, remetente_envio_email=None, senha_envio=None):
     """Entrega a mensagem no sistema (caixa do destinatário) e atualiza estruturas.
@@ -217,31 +224,28 @@ def entregar_mensagem_obj(mensagem, enviar_real=False, remetente_envio_email=Non
     dest = mensagem["destinatario"]
     remet = mensagem["remetente"]
 
-    # Adiciona à caixa de entrada local
     if dest not in caixas_entrada:
         caixas_entrada[dest] = []
     caixas_entrada[dest].append(mensagem)
     historico_geral.append(mensagem)
-    pilha_acoes.push(mensagem)  # empilha para permitir undo
+    pilha_acoes.push(mensagem)  
     grafo.adicionar_aresta(remet, dest)
 
-    # Tenta envio real caso solicitado
     if enviar_real and remetente_envio_email and senha_envio:
         assunto = f"Você recebeu uma mensagem de {remet}"
         corpo = f"De: {remet}\n\n{mensagem['texto']}"
-        success = enviar_email_smtp(remetente_envio_email, senha_envio, dest, assunto, corpo)
+        success = enviar_smtp(remetente_envio_email, senha_envio, dest, assunto, corpo)
         if not success:
             print("➡️ A entrega no sistema foi feita, mas o envio SMTP falhou.")
     else:
         print(f"💖 Mensagem entregue de {remet} para {dest} (sistema).")
 
-def entregar_proxima_da_fila(enviar_real=False):
+def entregar_fila(enviar_real=False):
     if fila_mensagens.isEmpty():
         print("Não há mensagens na fila (rascunhos).")
         return
     mensagem = fila_mensagens.dequeue()
     if enviar_real and "@" in mensagem["destinatario"]:
-        # requisitar credenciais SMTP do remetente (cache)
         if smtp_cache["email"] is None:
             smtp_cache["email"] = input("Digite seu e-mail (para SMTP, ex: seu@gmail.com): ").strip()
             smtp_cache["senha"] = input("Digite sua senha de app (App Password): ").strip()
@@ -302,19 +306,17 @@ def ranking_romanticos():
     for pos, (nome, qtd) in enumerate(ranking, 1):
         print(f"{pos}º - {nome} 💖 ({qtd} mensagens)")
 
-def desfazer_ultima_entrega():
+def desfazer_entrega():
     if pilha_acoes.isEmpty():
         print("Nada para desfazer.")
         return
     msg = pilha_acoes.pop()
     dest = msg["destinatario"]
-    # Remove da caixa de entrada (primeira ocorrência igual)
     if dest in caixas_entrada:
         for i, m in enumerate(caixas_entrada[dest]):
             if m is msg:
                 caixas_entrada[dest].pop(i)
                 break
-    # Remove do histórico (primeira ocorrência igual)
     for i, m in enumerate(historico_geral):
         if m is msg:
             historico_geral.pop(i)
@@ -324,18 +326,20 @@ def desfazer_ultima_entrega():
 # -----------------------------
 # Menus e fluxos
 # -----------------------------
-def enviar_mensagem_menu(usuario_logado):
+def enviar_mensagem(usuario_logado):
     limpar()
-    print("\n--- ✉️ ENVIAR MENSAGEM ---")
+    print("\n" + "═" * 60)
+    print(f" ✉️  ENVIAR MENSAGEM ".center(60))
+    print("═" * 60)
     destinatario = input("Para quem deseja enviar? (coloque nome ou e-mail): ").strip()
     if not destinatario:
         print("Destinatário inválido.")
         return
 
     print("""
-    1. ✍️ Escrever texto próprio
-    2. 💝 Usar mensagem pronta
-    3. 👤 Enviar como ANÔNIMO
+    1. ✍️  Escrever texto próprio
+    2. 💝  Usar mensagem pronta
+    3. 👤  Enviar como ANÔNIMO
     """)
     escolha = input("Opção: ").strip()
 
@@ -375,7 +379,6 @@ def enviar_mensagem_menu(usuario_logado):
     }
 
     if destino == "1":
-        # Perguntar se quer enviar real via SMTP (se dest parecer e-mail)
         enviar_real = False
         if "@" in destinatario:
             resp = input("Deseja enviar também por e-mail real (SMTP)? (s/n): ").strip().lower()
@@ -391,18 +394,21 @@ def enviar_mensagem_menu(usuario_logado):
     else:
         fila_mensagens.enqueue(mensagem)
         print("💾 Mensagem salva no rascunho (fila).")
+        input("\nPressione Enter para continuar...")
 
 def menu_mensagens(usuario_logado):
     while True:
         limpar()
-        print("\n--- 💌 MENU DE MENSAGENS ---")
+        print("\n" + "═" * 60)
+        print(f"💌 MENU DE MENSAGENS".center(60))
+        print("═" * 60)
         print("""
         1. ✉️ Enviar mensagem
         2. 📬 Entregar próxima mensagem da fila (rascunhos)
         3. 📥 Listar recebidas
         4. 📤 Listar enviadas
         5. 🔍 Pesquisar mensagens
-        6. 📜 Histórico geral
+        6. 📜 Histórico gerals
         7. ↶ Desfazer última entrega (undo)
         0. 🔙 Voltar
         """)
@@ -410,9 +416,8 @@ def menu_mensagens(usuario_logado):
         opcao = input("Escolha: ").strip()
 
         if opcao == "1":
-            enviar_mensagem_menu(usuario_logado)
+            enviar_mensagem(usuario_logado)
         elif opcao == "2":
-            # pergunta se envio real
             enviar_real = False
             if not fila_mensagens.isEmpty():
                 prox = fila_mensagens.peek()
@@ -422,7 +427,8 @@ def menu_mensagens(usuario_logado):
                 if enviar_real and smtp_cache["email"] is None:
                     smtp_cache["email"] = input("Digite seu e-mail (p.ex. seu@gmail.com): ").strip()
                     smtp_cache["senha"] = input("Digite sua senha de app (App Password): ").strip()
-            entregar_proxima_da_fila(enviar_real=enviar_real)
+            entregar_fila(enviar_real=enviar_real)
+            input("\nPressione Enter para continuar...")
         elif opcao == "3":
             listar_recebidas(input("Listar recebidas de quem? ").strip())
         elif opcao == "4":
@@ -432,7 +438,7 @@ def menu_mensagens(usuario_logado):
         elif opcao == "6":
             mostrar_historico()
         elif opcao == "7":
-            desfazer_ultima_entrega()
+            desfazer_entrega()
         elif opcao == "0":
             break
         else:
@@ -442,7 +448,7 @@ def menu_extras():
     while True:
         limpar()  
         print("\n" + "═" * 60)
-        print(f"--🏆 E X T R A S --".center(60))
+        print(f" 🏆 E X T R A S ".center(60))
         print("═" * 60)
         print("""
         1. 💞 Ranking dos mais românticos
@@ -453,27 +459,31 @@ def menu_extras():
         opcao = input("Escolha: ").strip()
         if opcao == "1":
             ranking_romanticos()
+            input("\nPressione Enter para continuar...")
         elif opcao == "2":
             lista = usuarios.listar_in_order()
             print("\n👥 Usuários cadastrados (ordem alfabética):")
             for nome in lista:
                 print("-", nome)
+            input("\nPressione Enter para continuar...")
         elif opcao == "3":
             print("\n🔗 Conexões remetente -> destinatário (contadores):")
             for r, mapa in grafo.adj.items():
                 print(f"{r}:")
                 for d, c in mapa.items():
                     print(f"   -> {d} (x{c})")
+            input("\nPressione Enter para continuar...")
         elif opcao == "0":
             break
         else:
             print("❌ Opção inválida.")
+            input("\nPressione Enter para continuar...")
 
 def menu_principal(usuario_logado):
     while True:
         limpar()
         print("\n" + "═" * 60)
-        print(f"💗 C O R R E I O   D O   A M O R  (user: {usuario_logado}) 💗".center(60))
+        print(f"💗 C O R R E I O   D O   A M O R  (Olá: {usuario_logado}) 💗".center(60))
         print("═" * 60)
         print("""
         1. 💗 Mensagens
@@ -492,7 +502,7 @@ def menu_principal(usuario_logado):
         elif opcao == "3":
             menu_extras()
         elif opcao == "0":
-            print("Saindo... obrigada por espalhar amor 💘")
+            print("Saindo...\nObrigada por espalhar amor 💘")
             break
         else:
             print("❌ Opção inválida.")
@@ -520,7 +530,7 @@ if __name__ == "__main__":
                 menu_principal(usuario)
                 break
         elif escolha == "0":
-            print("Até logo.")
+            print("Saindo...\nVenha espalhar amor 💘")
             break
         else:
             print("Opção inválida.")
