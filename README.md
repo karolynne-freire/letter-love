@@ -1,10 +1,8 @@
+# 💌 Letter Love – Sistema Romântico em Python
 
-# 💌 Letter Love - Sistema Romântico em Python
+O **Letter Love** é um sistema romântico desenvolvido como trabalho prático da disciplina de **Estrutura de Dados**.
 
-O **Letter Love** é um sistema romântico desenvolvido como trabalho prático da disciplina de Estrutura de Dados.
-
-A ideia mistura lógica, algoritmos e um toque de paixão:
-um *Correio do Amor Digital* onde usuários podem enviar:
+A proposta mistura lógica, algoritmos e um toque de paixão: um **Correio do Amor Digital**, onde usuários podem enviar:
 
 * 💖 Mensagens personalizadas
 * 💝 Mensagens prontas
@@ -32,13 +30,13 @@ O usuário pode escolher entre:
 E também decidir:
 
 * 📤 Enviar imediatamente
-* 📝 Salvar na fila de rascunhos (Queue – FIFO)
+* 📝 Salvar na fila de rascunhos (**Queue – FIFO**)
 
-### 📧 Envio por E-mail (SMTP) - em desenvolvimento
+### 📧 Envio por E-mail (SMTP) *(em desenvolvimento)*
 
 * Caso o destinatário seja um e-mail válido
-* Envio real usando SMTP (Gmail)
-* Opcional, escolhido pelo usuário
+* Envio real usando **SMTP (Gmail)**
+* Funcionalidade opcional, escolhida pelo usuário
 
 ### 📥 Caixa de Entrada
 
@@ -47,13 +45,12 @@ E também decidir:
 ### 🔙 Desfazer Última Entrega (Undo)
 
 * Implementado com **Stack (LIFO)**
-* Um verdadeiro *voltar no tempo do amor* 💔➡️💘
+* Um verdadeiro “voltar no tempo do amor” 💔➡️💘
 
 ### 🕸️ Grafo de Conexões Amorosas
 
-* Cada mensagem enviada cria uma aresta entre remetente → destinatário
-* Mostra as relações amorosas ou de amizade 👀
-
+* Cada mensagem enviada cria uma aresta entre **remetente → destinatário**
+* Permite visualizar relações amorosas ou de amizade 👀
 
 ### 🏆 Ranking dos Românticos
 
@@ -64,22 +61,22 @@ E também decidir:
 
 ## 🧠 Estruturas de Dados Utilizadas
 
-O sistema inteiro foi construído com base em estruturas clássicas estudadas na disciplina.
+O sistema foi construído com base em estruturas clássicas estudadas na disciplina:
 
-| Estrutura                       | Conceito                    | Aplicação                                 |
-| ------------------------------- | --------------------------- | ----------------------------------------- |
-| **Queue (Fila)**                | FIFO                        | Rascunhos de mensagens que aguardam envio |
-| **Stack (Pilha)**               | LIFO                        | Undo das últimas mensagens enviadas       |
-| **Árvore Binária (BST)**        | Busca, inserção e ordenação | Cadastro e listagem de usuários           |
-| **Grafo (Lista de Adjacência)** | Relações entre vértices     | Conexões remetente → destinatário         |
-| **Listas Simples**              | Estrutura linear            | Caixa de entrada e histórico              |
-| **Dicionário (Hash Map)**       | Chave → valor               | Armazenamento das mensagens prontas       |
+| Estrutura                   | Conceito                    | Aplicação                                 |
+| --------------------------- | --------------------------- | ----------------------------------------- |
+| Queue (Fila)                | FIFO                        | Rascunhos de mensagens que aguardam envio |
+| Stack (Pilha)               | LIFO                        | Undo das últimas mensagens enviadas       |
+| Árvore Binária (BST)        | Busca, inserção e ordenação | Cadastro e listagem de usuários           |
+| Grafo (Lista de Adjacência) | Relações entre vértices     | Conexões remetente → destinatário         |
+| Listas Simples              | Estrutura linear            | Caixa de entrada e histórico              |
+| Dicionário (Hash Map)       | Chave → valor               | Armazenamento das mensagens prontas       |
 
 ---
 
-### 📚 Dicionário de Mensagens Prontas
+## 📚 Dicionário de Mensagens Prontas
 
-Além das estruturas principais, o sistema usa um **dicionário** para armazenar frases românticas prontas:
+Além das estruturas principais, o sistema utiliza um dicionário para armazenar frases românticas prontas:
 
 ```python
 mensagens_prontas = {
@@ -89,13 +86,13 @@ mensagens_prontas = {
 }
 ```
 
-Assim, basta escolher o número da mensagem para usá-la instantaneamente.
+Assim, basta escolher o número da mensagem para utilizá-la instantaneamente.
 
 ---
 
 ## 🌸 Como Executar
 
-### 1️⃣ Clonar o Repositório
+### 1️⃣ Clonar o repositório
 
 ```bash
 git clone https://github.com/karolynne-freire/letter-love
@@ -109,14 +106,10 @@ cd letter-love
 
 ### 3️⃣ Abrir no editor de sua preferência
 
-Exemplos:
+* **VS Code**: `code .`
+* **PyCharm**: abrir a pasta pelo menu **Open**
 
-* VS Code: `code .`
-* PyCharm: abrir a pasta pelo menu "Open"
-
-### 4️⃣ Ter o **Python 3** instalado
-
-Certifique-se de que o comando abaixo funciona:
+### 4️⃣ Verificar se o Python 3 está instalado
 
 ```bash
 python --version
@@ -124,13 +117,15 @@ python --version
 
 ### 5️⃣ Executar o sistema
 
-````bash
-python main.py
 ```bash
 python main.py
-````
+```
 
-### (Em desenvolvimento) Envio de e-mails reais
+---
+
+## 📧 (Em desenvolvimento) Envio de e-mails reais
+
+Para utilizar essa funcionalidade:
 
 * Ter uma conta Gmail
 * Gerar um **App Password** (senha de aplicativo)
@@ -139,10 +134,10 @@ python main.py
 
 ## 🌼 Exemplos de Uso
 
-* Criar usuários e enviar bilhetes fofos
+* Criar usuários e enviar bilhetes românticos
 * Deixar mensagens acumuladas na fila de rascunhos
-* Mandar e-mail real para surpreender alguém
-* Desfazer um envio precipitado 😅
+* Enviar e-mail real para surpreender alguém
+* Desfazer um envio feito por impulso 😅
 * Ver quem é o maior romântico da turma
 * Analisar o grafo das conexões amorosas ❤️🕸️
 
@@ -158,17 +153,14 @@ python main.py
 
 ## ❤️ Mensagem da Equipe
 
-*"Nem sempre o amor segue lógica…
-mas no nosso caso, segue árvores, filas, pilhas e grafos."*
-— Equipe Letter Love 💕
+> *"Nem sempre o amor segue lógica… mas no nosso caso, segue árvores, filas, pilhas e grafos."*
+> — Equipe **Letter Love** 💕
 
 ---
 
 ## 📜 Licença
 
 Uso acadêmico — livre para consulta e aprimoramento.
-
----
 
 
 
