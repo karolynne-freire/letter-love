@@ -210,13 +210,19 @@ def login():
     nome = input("Digite seu nome (Enter para sair): ").strip().lower()
 
     if nome == "":
+        print("\n❌ Login cancelado.")
+        time.sleep(1)
         return None
+
     if usuarios.buscar(nome):
         print(f"\nBem-vindo(a), {nome} 💖\n")
+        time.sleep(1)
         return nome
-    print("\nUsuário não encontrado. Retornando ao menu...\n")
+
+    print("\n❌ Usuário não encontrado.")
     time.sleep(1)
     return None
+
 
 def entregar_mensagem_obj(mensagem, enviar_real=False, remetente_envio_email=None, senha_envio=None):
     """Entrega a mensagem no sistema (caixa do destinatário) e atualiza estruturas.
@@ -256,41 +262,39 @@ def entregar_fila(enviar_real=False):
 
 def listar_recebidas(nome):
     limpar()
-    if nome not in caixas_entrada or not caixas_entrada[nome]:
-        print(f"{nome} não tem mensagens recebidas.")
+    if nome not in caixas_entrada or len(caixas_entrada[nome]) == 0:
+        print("\n📭 Caixa de entrada vazia.")
+        print("Você ainda não recebeu nenhuma mensagem 💔")
+        input("\nPressione Enter para continuar...")
         return
-    print(f"\n📥 Mensagens recebidas por {nome}:")
-    for i, msg in enumerate(caixas_entrada[nome], 1):
-        print(f"{i}. De: {msg['remetente']} - Texto: {msg['texto']}")
+
+    print("\n📥 Mensagens recebidas:")
+    print("─" * 50)
+
+    for i, msg in enumerate(caixas_entrada[nome], start=1):
+        print(f"{i}. 💌 De: {msg['remetente']}")
+        print(f"   Mensagem: {msg['texto']}")
+        print("─" * 50)
+
+    input("\nPressione Enter para continuar...")
+
 
 def listar_enviadas(nome):
     limpar()
     enviadas = [m for m in historico_geral if m["remetente"] == nome]
-    if not enviadas:
-        print(f"{nome} não enviou nenhuma mensagem ainda.")
-        return
+
     print(f"\n📤 Mensagens enviadas por {nome}:")
+
+    if not enviadas:
+        print("\n📭 Sua caixa de mensagens enviadas está vazia.")
+        input("\nPressione Enter para continuar...")
+        return
+
     for i, msg in enumerate(enviadas, 1):
         print(f"{i}. Para: {msg['destinatario']} - Texto: {msg['texto']}")
 
-def mostrar_historico():
-    limpar()
-    if not historico_geral:
-        print("Nenhuma mensagem foi entregue ainda.")
-        return
-    print("\n📜 Histórico geral:")
-    for i, msg in enumerate(historico_geral, 1):
-        print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
+    input("\nPressione Enter para continuar...")
 
-def pesquisar_mensagens(nome):
-    limpar()
-    resultados = [m for m in historico_geral if m["remetente"] == nome or m["destinatario"] == nome]
-    if not resultados:
-        print("Nenhuma mensagem encontrada para esse nome.")
-        return
-    print(f"\n🔍 Mensagens relacionadas a '{nome}':")
-    for i, msg in enumerate(resultados, 1):
-        print(f"{i}. {msg['remetente']} → {msg['destinatario']} | {msg['texto']}")
 
 def ranking_romanticos():
     limpar()
@@ -331,7 +335,7 @@ def enviar_mensagem(usuario_logado):
     print("\n" + "═" * 60)
     print(f" ✉️  ENVIAR MENSAGEM ".center(60))
     print("═" * 60)
-    destinatario = input("Para quem deseja enviar? (coloque nome ou e-mail): ").strip()
+    destinatario = input("Para quem deseja enviar? (coloque nome): ").strip()
     if not destinatario:
         print("Destinatário inválido.")
         return
@@ -407,8 +411,6 @@ def menu_mensagens(usuario_logado):
         2. 📬 Entregar próxima mensagem da fila (rascunhos)
         3. 📥 Listar recebidas
         4. 📤 Listar enviadas
-        5. 🔍 Pesquisar mensagens
-        6. 📜 Histórico gerals
         7. ↶ Desfazer última entrega (undo)
         0. 🔙 Voltar
         """)
@@ -430,13 +432,9 @@ def menu_mensagens(usuario_logado):
             entregar_fila(enviar_real=enviar_real)
             input("\nPressione Enter para continuar...")
         elif opcao == "3":
-            listar_recebidas(input("Listar recebidas de quem? ").strip())
+            listar_recebidas(usuario_logado)
         elif opcao == "4":
-            listar_enviadas(input("Listar enviadas por quem? ").strip())
-        elif opcao == "5":
-            pesquisar_mensagens(input("Pesquisar por nome: ").strip())
-        elif opcao == "6":
-            mostrar_historico()
+            listar_enviadas(usuario_logado)
         elif opcao == "7":
             desfazer_entrega()
         elif opcao == "0":
@@ -489,48 +487,59 @@ def menu_principal(usuario_logado):
         1. 💗 Mensagens
         2. 👥 Perfil / Conta
         3. 🏆 Extras
-        0. ❌ Sair
+        0. ❌ Logout
         """)
+
         opcao = input("Escolha uma opção: ").strip()
+
         if opcao == "1":
             menu_mensagens(usuario_logado)
+
         elif opcao == "2":
             print(f"\nPerfil: {usuario_logado}")
-            resp = input("Deseja ver quantas mensagens recebeu? (s/n): ").strip().lower()
-            if resp == "s":
-                listar_recebidas(usuario_logado)
+            input("\nPressione Enter para continuar...")
+
         elif opcao == "3":
             menu_extras()
+
         elif opcao == "0":
-            print("Saindo...\nObrigada por espalhar amor 💘")
-            break
+            print("\n🔒 Logout realizado com sucesso.")
+            time.sleep(1)
+            return  # 🔴 
+
         else:
             print("❌ Opção inválida.")
+            time.sleep(1)
 limpar()
 # -----------------------------
 # Entrypoint
 # -----------------------------
 if __name__ == "__main__":
     apresentacao()
+
     while True:
         limpar()
         print("\n" + "═" * 60)
-        print(f"💗 C O R R E I O   D O   A M O R 💗".center(60))
+        print("💗 C O R R E I O   D O   A M O R 💗".center(60))
         print("═" * 60)
-        print("1.👥 Login")
-        print("2.📋 Cadastro")
-        print("0.❌ Sair")
+        print("1. 👥 Login")
+        print("2. 📋 Cadastro")
+        print("0. ❌ Sair")
 
         escolha = input("Escolha: ").strip()
+
         if escolha == "2":
             cadastrar_usuario()
+
         elif escolha == "1":
             usuario = login()
-            if usuario:
-                menu_principal(usuario)
-                break
+            if usuario is not None:
+                menu_principal(usuario)  
+
         elif escolha == "0":
             print("Saindo...\nVenha espalhar amor 💘")
             break
+
         else:
             print("Opção inválida.")
+            time.sleep(1)
